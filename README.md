@@ -4,7 +4,7 @@ Petite **web app statique** (HTML, CSS, JavaScript) inspirée des applis type *f
 
 ## Utilisation
 
-Ouvrez `index.html` dans un navigateur, ou servez le dossier à la racine d’un site. Aucune étape de build ni dépendance.
+Ouvrez simplement la page https://jean-pascal44.github.io/chooser/
 
 ## Contenu du dépôt
 
