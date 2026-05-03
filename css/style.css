@@ -186,3 +186,28 @@ body {
   outline: 2px solid #64748b;
   outline-offset: 2px;
 }
+
+.flash-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  pointer-events: none;
+  background: #fff;
+  opacity: 0;
+}
+
+.flash-overlay.is-active {
+  animation: screen-flash 0.45s ease-out;
+}
+
+@keyframes screen-flash {
+  0% {
+    opacity: 0;
+  }
+  18% {
+    opacity: 0.92;
+  }
+  100% {
+    opacity: 0;
+  }
+}

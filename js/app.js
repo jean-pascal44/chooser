@@ -2,12 +2,13 @@
   "use strict";
 
   const MIN_FINGERS = 2;
+  const STABILITY_MS = 5000;
 
   const playArea = document.getElementById("play-area");
   const markersLayer = document.getElementById("markers");
   const hint = document.getElementById("hint");
   const statusEl = document.getElementById("status");
-  const btnDraw = document.getElementById("btn-draw");
+  const flashOverlay = document.getElementById("flash-overlay");
   const btnReset = document.getElementById("btn-reset");
 
   /** @type {Map<number, { el: HTMLElement, color: string }>} */
@@ -16,6 +17,8 @@
   let roundLocked = false;
   /** @type {number | null} */
   let winnerPointerId = null;
+  /** @type {ReturnType<typeof setTimeout> | null} */
+  let stabilityTimerId = null;
 
   const COLORS = [
     "#ef4444",
@@ -40,9 +43,39 @@
     hint.classList.toggle("is-hidden", pointers.size > 0);
   }
 
-  function syncDrawButton() {
-    btnDraw.disabled = roundLocked || pointers.size < MIN_FINGERS;
+  function clearStabilityTimer() {
+    if (stabilityTimerId !== null) {
+      clearTimeout(stabilityTimerId);
+      stabilityTimerId = null;
+    }
   }
+
+  function rescheduleStabilityTimer() {
+    clearStabilityTimer();
+    if (roundLocked) return;
+    const count = pointers.size;
+    if (count < MIN_FINGERS) return;
+    const snapshot = count;
+    stabilityTimerId = setTimeout(function () {
+      stabilityTimerId = null;
+      if (roundLocked) return;
+      if (pointers.size !== snapshot || pointers.size < MIN_FINGERS) return;
+      runDrawWithFlash();
+    }, STABILITY_MS);
+  }
+
+  function runFlash() {
+    flashOverlay.classList.remove("is-active");
+    void flashOverlay.offsetWidth;
+    flashOverlay.classList.add("is-active");
+  }
+
+  function onFlashAnimationEnd(e) {
+    if (e.animationName !== "screen-flash") return;
+    flashOverlay.classList.remove("is-active");
+  }
+
+  flashOverlay.addEventListener("animationend", onFlashAnimationEnd);
 
   function placeMarker(el, clientX, clientY) {
     const rect = playArea.getBoundingClientRect();
@@ -50,6 +83,19 @@
     const y = clientY - rect.top;
     el.style.left = x + "px";
     el.style.top = y + "px";
+  }
+
+  function statusForCount() {
+    const n = pointers.size;
+    if (n === 0) return "";
+    if (n < MIN_FINGERS)
+      return "Encore " + (MIN_FINGERS - n) + " doigt(s) minimum.";
+    return (
+      n +
+      " doigt(s) — gardez ce nombre pendant " +
+      STABILITY_MS / 1000 +
+      " s pour lancer le tirage."
+    );
   }
 
   function onPointerDown(e) {
@@ -72,13 +118,9 @@
     placeMarker(el, e.clientX, e.clientY);
     pointers.set(e.pointerId, { el, color });
 
-    setStatus(
-      pointers.size < MIN_FINGERS
-        ? "Encore " + (MIN_FINGERS - pointers.size) + " doigt(s) minimum."
-        : pointers.size + " doigt(s) — vous pouvez tirer au sort."
-    );
+    setStatus(statusForCount());
     updateHint();
-    syncDrawButton();
+    rescheduleStabilityTimer();
   }
 
   function onPointerMove(e) {
@@ -105,13 +147,9 @@
     entry.el.remove();
     pointers.delete(e.pointerId);
 
-    if (pointers.size === 0) setStatus("");
-    else if (pointers.size < MIN_FINGERS)
-      setStatus("Encore " + (MIN_FINGERS - pointers.size) + " doigt(s) minimum.");
-    else setStatus(pointers.size + " doigt(s) — vous pouvez tirer au sort.");
-
+    setStatus(statusForCount());
     updateHint();
-    syncDrawButton();
+    rescheduleStabilityTimer();
   }
 
   function randomIndex(n) {
@@ -124,9 +162,9 @@
   function drawWinner() {
     if (pointers.size < MIN_FINGERS || roundLocked) return;
 
+    clearStabilityTimer();
     roundLocked = true;
     winnerPointerId = null;
-    syncDrawButton();
 
     const ids = Array.from(pointers.keys());
     const winIdx = randomIndex(ids.length);
@@ -149,20 +187,27 @@
     }
   }
 
+  function runDrawWithFlash() {
+    if (pointers.size < MIN_FINGERS || roundLocked) return;
+    clearStabilityTimer();
+    runFlash();
+    drawWinner();
+  }
+
   function resetRound() {
+    clearStabilityTimer();
     roundLocked = false;
     winnerPointerId = null;
     pointers.clear();
     markersLayer.replaceChildren();
+    flashOverlay.classList.remove("is-active");
     setStatus("");
     updateHint();
-    syncDrawButton();
   }
 
   playArea.addEventListener("pointerdown", onPointerDown, { passive: false });
   playArea.addEventListener("pointermove", onPointerMove);
   playArea.addEventListener("pointerup", onPointerUp);
   playArea.addEventListener("pointercancel", onPointerUp);
-  btnDraw.addEventListener("click", drawWinner);
   btnReset.addEventListener("click", resetRound);
 })();
