@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f1419" />
+    <meta name="description" content="Posez vos doigts sur l’écran, puis tirez au sort pour désigner un gagnant." />
+    <title>Chooser — Choisir avec les doigts</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>Chooser</h1>
+      <p class="tagline">Posez les doigts, puis lancez le tirage.</p>
+    </header>
+
+    <main id="play-area" aria-label="Zone tactile pour le tirage au sort">
+      <div id="markers" aria-hidden="true"></div>
+      <p id="hint" class="hint">Placez au moins deux doigts sur la zone, puis appuyez sur « Choisir ».</p>
+    </main>
+
+    <footer class="app-footer">
+      <p id="status" class="status" role="status"></p>
+      <div class="actions">
+        <button type="button" id="btn-draw" class="btn btn-primary" disabled>Choisir</button>
+        <button type="button" id="btn-reset" class="btn btn-ghost">Effacer</button>
+      </div>
+    </footer>
+
+    <script src="js/app.js" defer></script>
+  </body>
+</html>
