@@ -4,7 +4,7 @@ Petite **web app statique** (HTML, CSS, JavaScript) inspirée des applis type *f
 
 ## Utilisation
 
-Ouvrez `index.html` dans un navigateur, ou servez le dossier à la racine d’un site (par ex. [GitHub Pages](https://pages.github.com/)). Aucune étape de build ni dépendance.
+Ouvrez `index.html` dans un navigateur, ou servez le dossier à la racine d’un site. Aucune étape de build ni dépendance.
 
 ## Contenu du dépôt
 
@@ -15,3 +15,11 @@ Ouvrez `index.html` dans un navigateur, ou servez le dossier à la racine d’un
 | `js/app.js`    | Pointeurs multiples, tirage, réinitialisation |
 
 Le fichier `.no-jekyll` évite que GitHub Pages ne traite le site avec Jekyll.
+
+## Genèse du projet
+
+Le code et la documentation de ce dépôt a été **produite avec l’assistant IA de Cursor** (modèle conversationnel intégré à l’éditeur), **le 3 mai 2026**.
+
+---
+
+*Guidé par JP 😘*
